@@ -5,9 +5,9 @@
 
 活性化関数はactivation.py内に順伝播と逆伝播のメソッドを持つクラスとして定義されている。
 現在活性化関数として以下のものが定義されている。
-ReLU
-LReLU
-PReLU
+###ReLU
+###LReLU
+###PReLU
 ELU
 SELU
 Sigmoid
