@@ -140,13 +140,6 @@ class SoftSign(Activation):
     def backward(self, dY):
         return dY/(1.0 + self.X)**2 
 
-class Maxout:
-    """
-    http://blog.yusugomori.com/post/133257383300/%E6%95%B0%E5%BC%8F%E3%81%A7%E6%9B%B8%E3%81%8D%E4%B8%8B%E3%81%99-maxout-networks
-    """
-    def __init__(self):
-        pass
-
 def Softmax(X):
     option = X.ndim
     if option == 1:
