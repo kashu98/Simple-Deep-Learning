@@ -88,3 +88,40 @@ class Convolutional(Layer):
             for j in range(self.Y['width']):
                 self.X['delta'][:,:,i*self.stride:i*self.stride + self.W['hight'],j*self.stride:j*self.stride + self.W['width']] += dx[:,self.Y['width']*i + j,:,:,:]
         return self.X['delta']
+
+    class Maxout(Layer):
+    """Maxout layer (compatible with tensor) 
+    weight: (input nodes, pooling number, output node)
+    bias: (pooling number, output node)
+    X: (batch number, nodes)
+    Reference: http://proceedings.mlr.press/v28/goodfellow13.pdf
+    """
+    def __init__(self, weight, bias):
+        super().__init__(weight, bias)
+        self.W['patch'], self.W['hight'], self.W['width'] = weight.shape
+        self.B['patch'], self.B['width'] = bias.shape
+        self.Z = {'output':None, 'delta':None, 'batch':None, 'hight':None, 'width':None}
+        self.A = {'output':None, 'delta':None}
+
+    def forward(self, X):
+        super().forward(X)
+        self.X['output'] = self.X['input'].reshape(self.X['batch'],-1)
+        self.Z['output'] = np.tensordot(self.X['output'], self.W['weight'], axes=1) + self.B['bias']
+        self.A['output'] = np.max(self.Z['output'], axis=2)
+        return self.A['output']
+
+    def backward(self, dY):
+        self.Z['batch'], self.Z['hight'], self.Z['width'] = self.Z['output'].shape
+        self.Z['delta'] = np.zeros_like(self.Z['output'])
+        self.Z['delta'] = self.Z['delta'].reshape(-1, self.Z['width'])
+        index = np.argmax(self.Z['output'], axis=2).reshape(1,-1)[0]
+        dY = dY.reshape(1,-1)[0]
+
+        for i in range(len(index)):
+            self.Z['delta'][i, index[i]] = dY[i]
+        self.Z['delta'] = self.Z['delta'].reshape(self.Z['batch'], self.Z['hight'], self.Z['width'])
+        self.B['delta'] = np.sum(self.Z['delta'], axis=0)
+        self.W['delta'] = np.tensordot(self.X['output'].T, self.Z['delta'], axes=1)
+        self.X['delta'] = np.tensordot(self.Z['delta'], self.W['weight'].T, axes=2)
+        self.X['delta'] = self.X['delta'].reshape(self.X['shape'])
+        return self.X['delta']
