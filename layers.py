@@ -89,7 +89,7 @@ class Convolutional(Layer):
                 self.X['delta'][:,:,i*self.stride:i*self.stride + self.W['hight'],j*self.stride:j*self.stride + self.W['width']] += dx[:,self.Y['width']*i + j,:,:,:]
         return self.X['delta']
 
-    class Maxout(Layer):
+class Maxout(Layer):
     """Maxout layer (compatible with tensor) 
     weight: (input nodes, pooling number, output node)
     bias: (pooling number, output node)
