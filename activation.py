@@ -6,7 +6,7 @@ class Activation:
         self.X = None
         self.Y = None
         self.sign = None
-    def foward(self, X):
+    def forward(self, X):
         self.X = X
 
 class ReLU(Activation):
@@ -14,7 +14,7 @@ class ReLU(Activation):
     """
     def __init__(self):
         super().__init__()
-    def foward(self, X, α=0):
+    def forward(self, X, α=0):
         self.sign = (X <= 0)
         X[self.sign] = X[self.sign] * α
         return X
@@ -27,8 +27,8 @@ class LReLU(ReLU):
     """
     def __init__(self):
         super().__init__()
-    def foward(self, X):
-        return super().foward(X, 0.01)
+    def forward(self, X):
+        return super().forward(X, 0.01)
     def backward(self, dY):
         return super().backward(dY, 0.01)
 
@@ -38,9 +38,9 @@ class PReLU(ReLU):
     def __init__(self):
         super().__init__()
         self.α = None
-    def foward(self, X, α):
+    def forward(self, X, α):
         self.α = α
-        return super().foward(X, α)
+        return super().forward(X, α)
     def backward(self, dY):
         return super().backward(dY, self.α)
 
@@ -50,7 +50,7 @@ class ELU(Activation):
     def __init__(self):
         super().__init__()
         self.α = None
-    def foward(self, X, α, λ=1.0):
+    def forward(self, X, α, λ=1.0):
         self.α = α
         X = λ * X
         self.sign = (X <= 0)
@@ -69,8 +69,8 @@ class SELU(ELU):
         super().__init__() 
         self.α = 1.67326
         self.λ = 1.0507
-    def foward(self, X):
-        return super().foward(X, self.α, self.λ)
+    def forward(self, X):
+        return super().forward(X, self.α, self.λ)
     def backward(self, dY):
         return super().backward(dY, self.λ)
 
@@ -79,7 +79,7 @@ class Sigmoid(Activation):
     """
     def __init__(self):
         super().__init__()
-    def foward(self, X):
+    def forward(self, X):
         self.Y = 1/(1 + np.exp(-X))
         return self.Y
     def backward(self, dY):
@@ -91,11 +91,11 @@ class SoftPlus(Sigmoid):
     """
     def __init__(self):
         super().__init__()
-    def foward(self, X):
+    def forward(self, X):
         self.X = X
         return np.log(1.0 + np.exp(X))
     def backward(self, dY):
-        dX = dY * super().foward(self.X)
+        dX = dY * super().forward(self.X)
         return dX
 
 class Tanh(Activation):
@@ -103,7 +103,7 @@ class Tanh(Activation):
     """
     def __init__(self):
         super().__init__()
-    def foward(self, X):
+    def forward(self, X):
         self.Y = 2.0/(1.0 + np.exp(-2 * X) - 1.0)
         return self.Y
     def backward(self, dY):
@@ -115,7 +115,7 @@ class ArcTan(Activation):
     """
     def __init__(self):
         super().__init__()
-    def foward(self, X):
+    def forward(self, X):
         self.X = X
         return np.arctan(X)
     def backward(self, dY):
@@ -127,7 +127,7 @@ class SoftSign(Activation):
     """
     def __init__(self):
         super().__init__()
-    def foward(self, X):
+    def forward(self, X):
         self.sign = (X < 0)
         aX = X.copy()
         aX[self.sign] = -1.0 * aX[self.sign]
