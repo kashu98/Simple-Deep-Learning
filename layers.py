@@ -19,4 +19,21 @@ class Layer:
             self.X['hight'], self.X['channel'] = 1,1
             self.X['batch'], self.X['width'] = X.shape
         elif len(X.shape) == 4:
-            self.X['batch'], self.X['channel'], self.X['hight'], self.X['width'] = X.shape 
+            self.X['batch'], self.X['channel'], self.X['hight'], self.X['width'] = X.shape
+  
+class Affine(Layer):
+    """Affaine Layer (compatible with tensor) 
+    """
+    def __init__(self, weight, bias):
+        super().__init__(weight, bias)
+
+    def foward(self, X):
+        super().foward(X)
+        self.X['output'] = self.X['input'].reshape(self.X['batch'],-1)
+        return np.dot(self.X['output'], self.W['weight']) + self.B['bias']
+
+    def backward(self, dY):
+        self.W['delta'] = np.dot(self.X['output'].T, dY)
+        self.B['delta'] = np.sum(dY, axis=0)
+        return np.dot(dY, self.W['weight'].T).reshape(self.X['shape'])
+
