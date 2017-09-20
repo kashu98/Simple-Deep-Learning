@@ -125,3 +125,48 @@ class Maxout(Layer):
         self.X['delta'] = np.tensordot(self.Z['delta'], self.W['weight'].T, axes=2)
         self.X['delta'] = self.X['delta'].reshape(self.X['shape'])
         return self.X['delta']
+
+class Pooling(Layer):
+    """Pooling Layer
+    """
+    def __init__(self, pool_hight, pool_width, stride=1, pad=0, pad_val=0):
+        self.X = {'input':None, 'output':None, 'shape':None, 'delta':None, 'batch':None, 'channel':None, 'hight':None, 'width':None}
+        self.Y = {'hight':None, 'width':None}
+        self.pool = {'hight':pool_hight, 'width':pool_width}
+        self.stride = stride
+        self.pad = pad
+        self.pad_val = pad_val
+
+        self.x = None
+        self.option = None
+
+    def forward(self, X, option=0):
+        super().forward(X)
+        self.option = option
+        self.X['output'] = np.pad(self.X['input'], [(0,0), (0,0), (self.pad, self.pad), (self.pad, self.pad)], 'constant', constant_values=self.pad_val)
+        self.Y['hight'] = (self.X['hight'] - self.pool['hight'] + 2*self.pad)//self.stride + 1    
+        self.Y['width'] = (self.X['width'] - self.pool['width'] + 2*self.pad)//self.stride + 1
+        self.x = np.zeros((self.X['batch'], self.Y['hight']*self.Y['width'], self.X['channel'], self.pool['hight'], self.pool['width']))
+        for i in range(self.Y['hight']):
+            for j in range(self.Y['width']):
+                self.x[:,self.Y['width']*i + j,:,:,:] = self.X['output'][:,:,i*self.stride:i*self.stride + self.pool['hight'],j*self.stride:j*self.stride + self.pool['width']]
+        self.x = self.x.reshape(self.X['batch'], self.Y['hight']*self.Y['width'], self.X['channel'], self.pool['hight']*self.pool['width'])
+        if self.option == 0: # max pooloing
+            self.x = np.max(self.x, axis=3).transpose(0,2,1)
+        elif self.option ==1: # average pooling
+            self.x = np.average(self.x, axis=3).transpose(0,2,1)
+        return self.x.reshape(self.X['batch'], self.X['channel'], self.Y['hight'], self.Y['width'])
+
+    def backward(self, dY):
+        dY.reshape(self.X['batch'], self.X['channel'],-1)
+        
+        self.X['delta'] = np.zeros(self.X['shape'])
+        for i in range(self.Y['hight']):
+            for j in range(self.Y['width']):
+                self.X['delta'][:,:,i*self.stride:i*self.stride + self.W['hight'],j*self.stride:j*self.stride + self.W['width']] += dx[:,self.Y['width']*i + j,:,:,:]
+        return self.X['delta']
+        if self.option == 0:# max pooloing
+            pass
+        elif self.option ==1:# average pooling
+            pass
+        pass
