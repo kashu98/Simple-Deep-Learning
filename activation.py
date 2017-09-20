@@ -9,10 +9,6 @@ class Activation:
     def foward(self, X):
         self.X = X
 
-"""
-All of the following functions are based on the list of https://en.wikipedia.org/wiki/Activation_function
-"""
-
 class ReLU(Activation):
     """Rectified Linear Unit 
     """
