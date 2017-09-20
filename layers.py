@@ -158,15 +158,17 @@ class Pooling(Layer):
         return self.x.reshape(self.X['batch'], self.X['channel'], self.Y['hight'], self.Y['width'])
 
     def backward(self, dY):
-        dY.reshape(self.X['batch'], self.X['channel'],-1)
-        
-        self.X['delta'] = np.zeros(self.X['shape'])
+        dY = dY.reshape(self.X['batch'], self.X['channel'],-1).transpose(0,2,1)
+        dx = np.zeros((self.X['batch'], self.Y['hight']*self.Y['width'], self.X['channel'], self.pool['hight']*self.pool['width']))
+
+        if self.option == 0:# max pooloing
+            
+        elif self.option ==1:# average pooling
+            dY = dY.reshape(self.X['batch'], self.Y['hight']*self.Y['width'], self.X['channel'],1)
+            dx = dx + dY
+            dx = dx.reshape(self.X['batch'], self.Y['hight']*self.Y['width'], self.X['channel'], self.pool['hight'], self.pool['width'])
+
         for i in range(self.Y['hight']):
             for j in range(self.Y['width']):
                 self.X['delta'][:,:,i*self.stride:i*self.stride + self.W['hight'],j*self.stride:j*self.stride + self.W['width']] += dx[:,self.Y['width']*i + j,:,:,:]
         return self.X['delta']
-        if self.option == 0:# max pooloing
-            pass
-        elif self.option ==1:# average pooling
-            pass
-        pass
