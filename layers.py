@@ -160,15 +160,19 @@ class Pooling(Layer):
     def backward(self, dY):
         dY = dY.reshape(self.X['batch'], self.X['channel'],-1).transpose(0,2,1)
         dx = np.zeros((self.X['batch'], self.Y['hight']*self.Y['width'], self.X['channel'], self.pool['hight']*self.pool['width']))
-
         if self.option == 0:# max pooloing
-            
+            index = np.argmax(self.X['output'], axis=3).reshape(1,-1)[0]
+            dY = dY.reshape(1,-1)[0]
+            dx = dx.reshape(-1, self.pool['hight']*self.pool['width'])
+            for i in range(len(index)):
+                dx[i,index[i]] = dY[i]
         elif self.option ==1:# average pooling
             dY = dY.reshape(self.X['batch'], self.Y['hight']*self.Y['width'], self.X['channel'],1)
             dx = dx + dY
-            dx = dx.reshape(self.X['batch'], self.Y['hight']*self.Y['width'], self.X['channel'], self.pool['hight'], self.pool['width'])
-
+        
+        dx = dx.reshape(self.X['batch'], self.Y['hight']*self.Y['width'], self.X['channel'], self.pool['hight'], self.pool['width'])
+        self.X['delta'] =  np.zeros(self.X['shape'])
         for i in range(self.Y['hight']):
             for j in range(self.Y['width']):
-                self.X['delta'][:,:,i*self.stride:i*self.stride + self.W['hight'],j*self.stride:j*self.stride + self.W['width']] += dx[:,self.Y['width']*i + j,:,:,:]
+                self.X['delta'][:,:,i*self.stride:i*self.stride + self.pool['hight'],j*self.stride:j*self.stride + self.pool['width']] += dx[:,self.Y['width']*i + j,:,:,:]
         return self.X['delta']
