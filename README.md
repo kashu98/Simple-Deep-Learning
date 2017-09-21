@@ -8,7 +8,7 @@
 現在活性化関数として以下のものが定義されている。
 ##### ReLU (Rectified Linear Unit)
 <p align="center">
-    <img src="https://en.wikipedia.org/wiki/Activation_function#/media/File:Activation_rectified_linear.svg" width="480"\>
+    <img src="https://en.wikipedia.org/wiki/Activation_function#/media/File:Activation_rectified_linear.svg"\>
 </p>
 
 
