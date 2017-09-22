@@ -10,8 +10,9 @@
 ##### ELU (Exponential Linear Unit)
 ##### SELU (Scaled Exponential Linear Unit)
 ##### Sigmoid (Logistic Function)
-<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
-<mrow><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mfrac linethickness="1"><mrow><mrow><mn>1</mn></mrow></mrow><mrow><mrow><mn>1</mn><mo>+</mo><msup><mrow><mi>e</mi></mrow><mrow><mrow><mo>-</mo><mi>x</mi></mrow></mrow></msup></mrow></mrow></mfrac></mrow></math>
+
+<img src="https://latex.codecogs.com/gif.latex?f(x)=\frac{1}{1&plus;e^{-x}}" />
+
 ##### SoftPlus 
 ##### Tanh
 ##### Arctan
