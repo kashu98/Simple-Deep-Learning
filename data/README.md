@@ -1,4 +1,4 @@
 # Data sets
-## CIFAR-10  
-## CIFAR-100
-## MNIST
+### CIFAR-10  
+### CIFAR-100
+### MNIST
