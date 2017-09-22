@@ -6,8 +6,7 @@
 現在活性化関数として以下のものが定義されている。
 ##### ReLU (Rectified Linear Unit)
 ```math
-\left( \sum_{k=1}^n a_k b_k \right)^{!!2} \leq
-\left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)
+ e^{i \pi} = -1 
 ```
 ##### LReLU (Leaky Rectified Linear Unit)
 ##### PReLU (Parameteric Rectified Linear Unit)
