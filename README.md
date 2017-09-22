@@ -5,9 +5,7 @@
 活性化関数はactivation.py内に順伝播と逆伝播のメソッドを持つクラスとして定義されている。
 現在活性化関数として以下のものが定義されている。
 ##### ReLU (Rectified Linear Unit)
-```math
- e^{i \pi} = -1 
-```
+$e^{i \pi} = -1$ 
 ##### LReLU (Leaky Rectified Linear Unit)
 ##### PReLU (Parameteric Rectified Linear Unit)
 ##### ELU (Exponential Linear Unit)
