@@ -21,6 +21,12 @@ backward:
 ##### Soft sign
 ## Layers
 ##### Convolution Layer
+Input:  
+X(batch number, channel, hight, width)  
+Karnel(patch number, channel, hight, width)  
+step size (default is 1)  
+padding width (default is 0)  
+padding value (default is 0)  
 ##### Pooling Layer
 ##### Affine Layer
 ##### Maxout Layer
