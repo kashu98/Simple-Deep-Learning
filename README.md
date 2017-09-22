@@ -11,7 +11,7 @@
 ##### SELU (Scaled Exponential Linear Unit)
 ##### Sigmoid (Logistic Function)
 
-<img src="https://latex.codecogs.com/gif.latex?f(x)=\frac{1}{1&plus;e^{-x}}" />
+forward: <img src="https://latex.codecogs.com/gif.latex?f(x)=\frac{1}{1&plus;e^{-x}}" />
 
 ##### SoftPlus 
 ##### Tanh
