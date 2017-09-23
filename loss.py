@@ -5,8 +5,7 @@ def MAE(X, T):
     Xは（バッチ数、幅）からなる二次元ベクトル
     Tは（バッチ数、幅）からなる二次元ベクトル
     """
-    L = np.absolute(X-T)
-    return np.sum(L, axis=1)/X.shape[1]
+    return np.sum(np.absolute(X-T), axis=1)/X.shape[1]
 
 def MSE(X, T):
     """Mean Square Error
