@@ -5,8 +5,23 @@
 活性化関数はactivation.py内に順伝播と逆伝播のメソッドを持つクラスとして定義されている。
 現在活性化関数として以下のものが定義されている。
 #### ReLU (Rectified Linear Unit)
+
+forward:  
+<img src="https://latex.codecogs.com/gif.latex?f(x)=\left\{\begin{matrix}0\;&space;(x\leq&space;0)&space;\\&space;x\;&space;(x>0)&space;\end{matrix}\right." />  
+backward:  
+<img src="https://latex.codecogs.com/gif.latex?f(x)=\left\{\begin{matrix}0\;&space;(x\leq&space;0)&space;\\&space;1\;&space;(x>0)&space;\end{matrix}\right." />
+
 #### LReLU (Leaky Rectified Linear Unit)
+
+forward:  
+<img src="https://latex.codecogs.com/gif.latex?f(x)=\left\{\begin{matrix}0.01x\;&space;(x\leq&space;0)&space;\\&space;x\;&space;\;&space;\;&space;\;&space;\;&space;\;&space;\;(x>0)&space;\end{matrix}\right."/>  
+backward:  
+<img src="https://latex.codecogs.com/gif.latex?f(x)=\left\{\begin{matrix}0.01\;&space;(x\leq&space;0)&space;\\&space;1\;&space;\;&space;\;&space;\;&space;\;&space;\;&space;\;(x>0)&space;\end{matrix}\right."/>  
 #### PReLU (Parameteric Rectified Linear Unit)
+forward:  
+<img src="https://latex.codecogs.com/gif.latex?f(\alpha&space;,x)=\left\{\begin{matrix}\alpha&space;x\;&space;(x\leq&space;0)&space;\\&space;\;&space;\;&space;x\;\;(x>0)&space;\end{matrix}\right."/>  
+backward:  
+<img src="https://latex.codecogs.com/gif.latex?f(\alpha&space;,x)=\left\{\begin{matrix}\alpha&space;\;&space;(x\leq&space;0)&space;\\&space;\;&space;\;&space;1\;(x>0)&space;\end{matrix}\right."/>  
 #### ELU (Exponential Linear Unit)
 #### SELU (Scaled Exponential Linear Unit)
 #### Sigmoid (Logistic Function)
