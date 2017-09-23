@@ -50,3 +50,6 @@ padding value (default is 0)
 #### Batch Normalization Layer
 #### Dropout Layer
 ## Loss Function
+#### MAE
+#### MSE
+#### RMSE
