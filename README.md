@@ -3,7 +3,7 @@ Python implementations of Deep Learning models and algorithms with a minimum use
 畳み込み層の入力データは（バッチ数、チャネル数、高さ、幅）からなる４階テンソルとする。  
 全結合層の入力データは（バッチ数、幅）からなるベクトルとする。
 ## Activation Functions
-The following activation functions are defined as a class that has forward and backward methods in activation.py.   
+The following activation functions are defined in activation.py as a class that has forward and backward methods.   
 活性化関数はactivation.py内に順伝播と逆伝播のメソッドを持つクラスとして定義されている。
 現在活性化関数として以下のものが定義されている。
 #### ReLU (Rectified Linear Unit)
