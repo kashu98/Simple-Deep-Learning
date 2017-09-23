@@ -1,4 +1,5 @@
 # Simple Deep Learning
+Python implementations of Deep Learning models and algorithms with a minimum use of external library. 
 畳み込み層の入力データは（バッチ数、チャネル数、高さ、幅）からなる４階テンソルとする。  
 全結合層の入力データは（バッチ数、幅）からなるベクトルとする。
 ## Activation Functions
