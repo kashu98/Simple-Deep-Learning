@@ -176,3 +176,28 @@ class Maxout(Layer):
         self.X['delta'] = np.tensordot(self.Z['delta'], self.W['weight'].T, axes=2)
         self.X['delta'] = self.X['delta'].reshape(self.X['shape'])
         return self.X['delta']
+    
+class BatchNormalization(Layer):
+    """Batch Normalizatoin Layer
+    References: http://proceedings.mlr.press/v37/ioffe15.pdf
+    """
+    def __init__(self, gamma, beta):
+        self.N = {'gamma':gamma, 'beta':beta, 'delta-gamma':None, 'delta-beta':None, 'mean':None, 'varience':None, 'delta-mean':None, 'delta-varience':None, 'delta-hat':None}
+        self.X = {'input':None, 'output':None, 'shape':None, 'delta':None, 'batch':None, 'channel':None, 'hight':None, 'width':None}
+        self.eps = 10e-7
+        
+    def forward(self, X):
+        super().forward(X)
+        self.N['mean'] = self.X['input'].mean(axis=0)
+        self.N['variance'] = np.mean((self.X['input']-self.N['mean'])**2, axis=0)
+        self.X['output'] = (self.X['input']-self.N['mean'])/np.sqrt(self.N['variance'] + self.eps)
+        return self.N['gamma']*self.X['output'] + self.N['beta']
+
+    def backward(self, dY):
+        self.N['delta-beta'] = np.sum(dY, axis=0)
+        self.N['delta-gamma'] = np.sum(dY*self.X['output'], axis=0)
+        self.N['delta-hat'] = dY*self.N['gamma']
+        self.N['delta-varience'] = np.sum((-0.5)*self.N['delta-hat']*(self.X['input']-self.N['mean'])*(self.N['varience']+self.eps)**(-1.5), axis=0)
+        self.N['delta-mean'] = np.sum((-1)*self.N['delta-hat']/np.sqrt(self.N['variance'] + self.eps),axis=0) - 2*self.N['delta-varience']*np.mean((self.X['input']-self.N['mean']), axis=0)
+        self.X['delta'] = (-1)*self.N['delta-hat']/np.sqrt(self.N['variance'] + self.eps) + 2*self.N['delta-varience']*(self.X['input']-self.N['mean'])/self.X['batch'] + self.N['delta-mean']/self.X['batch']
+        return self.X['delta']
