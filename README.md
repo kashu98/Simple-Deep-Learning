@@ -52,5 +52,5 @@ padding value (default is 0)
 #### RMSE (Root Mean Square Error)
 
 ## Reference  
-Following links are used as reference
+Following links are used as reference:  
 https://en.wikipedia.org/wiki/Activation_function
