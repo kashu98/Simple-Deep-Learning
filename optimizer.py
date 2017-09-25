@@ -8,7 +8,7 @@ class SGD:
     """Stochastic gradient descent (SGD)
     SGD and its variants are probably the most used optimization algorithms for machine learning in general and for deep learning in particular.
     Require: Learning rate ε
-    Require: Initial parameter θ.
+    Require: Initial parameter θ. #こいつが更新されるー＞基本的に重み
     Algorithm: 
         while stopping criterion not met do \n
         \t    Sample a minibatch of m examples from the training set {x_1,...,x_m} with coresponding targets y_i \n
@@ -16,10 +16,11 @@ class SGD:
         \t    Apply update: θ ← θ - εg \n
         end while
     """
-    def __init__(self, ε=0.01):
-        self.ε = ε
-    def __call__(self,):
-        pass
+    def __init__(self, learning_rate=0.01):
+        self.learning_rate = learning_rate
+    
+    def optimize(self, parameter, gradient):
+        parameter -= self.learning_rate * gradient
 
 class Momentum:
     """The method of momentum (Polyak, 1964)
@@ -34,10 +35,21 @@ class Momentum:
         \t    Apply update: θ ← θ - v \n
         end while
     """
-    def __init__(self,):
-        pass
-    def __call__(self,):
-        pass
+    def __init__(self,learning_rate=0.01, momentum=0.9):
+        self.learning_rate = learning_rate
+        self.momentum = momentum
+        self.velocity = None
+
+    def __init__(self, velocity, learning_rate=0.01, momentum=0.9):
+        self.learning_rate = learning_rate
+        self.momentum = momentum
+        self.velocity = velocity
+
+    def optimize(self, parameter, gradient):
+        if self.volocity is None:
+            self.velocity = np.zeros_like(parameter)
+        self.velocity = self.momentum * self.velocity - self.learning_rate * gradient
+        parameter -= self.velocity
 
 class Nesterov_Momentum(Momentum):
     """(Sutskever, 2013)
