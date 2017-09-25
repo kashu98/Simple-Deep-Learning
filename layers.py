@@ -192,7 +192,13 @@ class BatchNormalization(Layer):
         self.N['variance'] = np.mean((self.X['input']-self.N['mean'])**2, axis=0)
         self.X['output'] = (self.X['input']-self.N['mean'])/np.sqrt(self.N['variance'] + self.eps)
         return self.N['gamma']*self.X['output'] + self.N['beta']
-
+    
+    def predict(self, X, mean, varience):
+        self.p_mean = mean
+        self.p_varience = varience
+        self.X['output'] = (X - self.p_mean)/np.sqrt(self.p_varience + self.eps)
+        return self.N['gamma']*self.X['output'] + self.N['beta']
+    
     def backward(self, dY):
         self.N['delta-beta'] = np.sum(dY, axis=0)
         self.N['delta-gamma'] = np.sum(dY*self.X['output'], axis=0)
@@ -201,3 +207,21 @@ class BatchNormalization(Layer):
         self.N['delta-mean'] = np.sum((-1)*self.N['delta-hat']/np.sqrt(self.N['variance'] + self.eps),axis=0) - 2*self.N['delta-varience']*np.mean((self.X['input']-self.N['mean']), axis=0)
         self.X['delta'] = (-1)*self.N['delta-hat']/np.sqrt(self.N['variance'] + self.eps) + 2*self.N['delta-varience']*(self.X['input']-self.N['mean'])/self.X['batch'] + self.N['delta-mean']/self.X['batch']
         return self.X['delta']
+    
+class Dropout(Layer):
+    """Dropout Layer
+    全結合層
+    """
+    def __init__(self, dropout_rate):
+        self.rate = dropout_rate
+        self.mask = None    
+
+    def forward(self, X):
+        self.mask = np.random.rand(*X.shape) < self.rate
+        return X * self.mask
+    
+    def predict(self, X):
+        return X * self.rate
+
+    def backward(self, dY):
+        return dY * self.mask
