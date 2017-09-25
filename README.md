@@ -49,3 +49,6 @@ padding value (default is 0)
 #### MAE
 #### MSE
 #### RMSE
+
+## Reference
+https://en.wikipedia.org/wiki/Activation_function
