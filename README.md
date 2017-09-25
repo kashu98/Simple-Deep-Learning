@@ -1,7 +1,7 @@
 # Simple Deep Learning
 This is a Python implementation of Deep Learning models and algorithms with a minimum use of external library. Simple Deep Learning aims to learn the basic concepts of deep learning by creating a library from scratch. 
 ## Activation Functions
-The following activation functions are defined in activation.py as a class that has forward and backward methods.   
+The following activation functions are defined in activation.py as class that has forward and backward methods.   
 #### ReLU (Rectified Linear Unit)
 
 forward:  
@@ -32,7 +32,8 @@ backward:
 #### Tanh
 #### Arctan
 #### Soft sign
-## Layers
+## Layers  
+The following layers are defined in layers.py as class that has forward and backward methods (someof them have predict method)
 #### Convolution Layer
 Input:  
 X(batch number, channel, hight, width)  
@@ -46,9 +47,10 @@ padding value (default is 0)
 #### Batch Normalization Layer
 #### Dropout Layer
 ## Loss Function
-#### MAE
-#### MSE
-#### RMSE
+#### MAE (Mean Absolute Error)
+#### MSE (Mean Square Error)
+#### RMSE (Root Mean Square Error)
 
-## Reference
+## Reference  
+Following links are used as reference
 https://en.wikipedia.org/wiki/Activation_function
