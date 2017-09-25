@@ -1,5 +1,5 @@
 # Simple Deep Learning
-This is Python implementations of Deep Learning models and algorithms with a minimum use of external library to build a neural network.    
+This is a Python implementation of Deep Learning models and algorithms with a minimum use of external library. Simple Deep Learning aims to learn the basic concepts of deep learning by creating a library from scratch. 
 ## Activation Functions
 The following activation functions are defined in activation.py as a class that has forward and backward methods.   
 #### ReLU (Rectified Linear Unit)
