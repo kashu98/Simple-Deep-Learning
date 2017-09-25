@@ -40,13 +40,13 @@ class Momentum:
         self.momentum = momentum
         self.velocity = None
 
-    def __init__(self, velocity, learning_rate=0.01, momentum=0.9):
+    def __call__(self, velocity, learning_rate=0.01, momentum=0.9):
         self.learning_rate = learning_rate
         self.momentum = momentum
         self.velocity = velocity
 
     def optimize(self, parameter, gradient):
-        if self.volocity is None:
+        if self.velocity is None:
             self.velocity = np.zeros_like(parameter)
         self.velocity = self.momentum * self.velocity - self.learning_rate * gradient
         parameter -= self.velocity
