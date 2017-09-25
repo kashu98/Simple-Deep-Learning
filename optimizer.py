@@ -8,7 +8,7 @@ class SGD:
     """Stochastic gradient descent (SGD)
     SGD and its variants are probably the most used optimization algorithms for machine learning in general and for deep learning in particular.
     Require: Learning rate ε
-    Require: Initial parameter θ. #こいつが更新されるー＞基本的に重み
+    Require: Initial parameter θ.
     Algorithm: 
         while stopping criterion not met do \n
         \t    Sample a minibatch of m examples from the training set {x_1,...,x_m} with coresponding targets y_i \n
