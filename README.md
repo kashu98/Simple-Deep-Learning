@@ -31,7 +31,7 @@ backward:
 #### SoftPlus 
 #### Tanh
 #### Arctan
-#### Soft sign
+#### SoftSign
 ## Layers  
 The following layers are defined in layers.py as class that has forward and backward methods (someof them have predict method)
 #### Convolution Layer
