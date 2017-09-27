@@ -53,5 +53,5 @@ padding value (default is 0)
 
 ## Reference  
 Following links are used as reference:  
-https://en.wikipedia.org/wiki/Activation_function
+https://en.wikipedia.org/wiki/Activation_function  
 http://www.deeplearningbook.org/contents/optimization.html
