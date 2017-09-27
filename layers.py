@@ -1,7 +1,7 @@
 import numpy as np
 
 class Layer:
-    def __init__(self, weight, bias):
+    def __init__(self, weight=None, bias=None):
         self.B = {'bias':bias, 'delta':None}
         self.X = {'input':None, 'output':None, 'shape':None, 'delta':None, 'batch':None, 'channel':None, 'hight':None, 'width':None}
         self.W = {'weight':weight, 'delta':None}
@@ -12,7 +12,16 @@ class Layer:
         elif len(weight.shape) == 4:
             self.W['patch'], self.W['channel'], self.W['hight'], self.W['width'] = weight.shape 
     
-    def foward(self, X):
+    def __call__(self, weight, bias):    
+        self.B['bias'] = bias
+        self.W['weight'] = weight 
+        if len(weight.shape) == 2:
+            self.W['patch'], self.W['channel'] = 1,1
+            self.W['hight'], self.W['width'] = weight.shape 
+        elif len(weight.shape) == 4:
+            self.W['patch'], self.W['channel'], self.W['hight'], self.W['width'] = weight.shape 
+
+    def forward(self, X):
         self.X['input'] = X
         self.X['shape'] = X.shape
         if len(X.shape) == 2:
@@ -20,15 +29,19 @@ class Layer:
             self.X['batch'], self.X['width'] = X.shape
         elif len(X.shape) == 4:
             self.X['batch'], self.X['channel'], self.X['hight'], self.X['width'] = X.shape
-  
+
+
 class Affine(Layer):
     """Affaine Layer (compatible with tensor) 
     """
-    def __init__(self, weight, bias):
+    def __init__(self, weight=None, bias=None):
         super().__init__(weight, bias)
 
-    def foward(self, X):
-        super().foward(X)
+    def __call__(self, weight, bias):
+        super().__call__(weight, bias)
+
+    def forward(self, X):
+        super().forward(X)
         self.X['output'] = self.X['input'].reshape(self.X['batch'],-1)
         return np.dot(self.X['output'], self.W['weight']) + self.B['bias']
 
@@ -40,7 +53,7 @@ class Affine(Layer):
 class Convolutional(Layer):
     """Convolutional Layer
     """
-    def __init__(self, filter, bias, stride=1, pad=0, pad_val=0):
+    def __init__(self, filter=None, bias=None, stride=1, pad=0, pad_val=0):
         super().__init__(filter, bias)
         self.Y = {'hight':None, 'width':None}
         self.stride = stride
@@ -48,7 +61,13 @@ class Convolutional(Layer):
         self.pad_val = pad_val
 
         self.x = None
-    
+
+    def __call__(self, filter, bias, stride=1, pad=0, pad_val=0):
+        super().__init__(filter, bias)
+        self.stride = stride
+        self.pad = pad
+        self.pad_val = pad_val
+
     def forward(self, X):
         super().forward(X)
         self.X['output'] = np.pad(self.X['input'], [(0,0), (0,0), (self.pad, self.pad), (self.pad, self.pad)], 'constant', constant_values=self.pad_val)
@@ -62,7 +81,7 @@ class Convolutional(Layer):
         self.x = self.x.reshape(self.X['batch'], self.Y['hight'], self.Y['width'], self.X['channel'], self.W['hight'], self.W['width'])
         return np.tensordot(self.x, self.W['weight'].transpose(1,2,3,0), axes=3).transpose(0,3,1,2) + self.B['bias']
 
-    def __forward(self, X):
+    def forward2(self, X):
         #ベクトルの内積に落とし込む方法(.forward(X)推奨)
         super().forward(X)
         self.X['output'] = np.pad(self.X['input'], [(0,0), (0,0), (self.pad, self.pad), (self.pad, self.pad)], 'constant', constant_values=self.pad_val)
@@ -92,7 +111,7 @@ class Convolutional(Layer):
 class Pooling(Layer):
     """Pooling Layer
     """
-    def __init__(self, pool_hight, pool_width, stride=1, pad=0, pad_val=0):
+    def __init__(self, pool_hight=3, pool_width=3, stride=1, pad=0, pad_val=0):
         self.X = {'input':None, 'output':None, 'shape':None, 'delta':None, 'batch':None, 'channel':None, 'hight':None, 'width':None}
         self.Y = {'hight':None, 'width':None}
         self.pool = {'hight':pool_hight, 'width':pool_width}
@@ -102,6 +121,12 @@ class Pooling(Layer):
 
         self.x = None
         self.option = None
+
+    def __call__(self, pool_hight, pool_width, stride=1, pad=0, pad_val=0):
+        self.pool = {'hight':pool_hight, 'width':pool_width}
+        self.stride = stride
+        self.pad = pad
+        self.pad_val = pad_val
 
     def forward(self, X, option=0):
         super().forward(X)
@@ -113,11 +138,11 @@ class Pooling(Layer):
         for i in range(self.Y['hight']):
             for j in range(self.Y['width']):
                 self.x[:,self.Y['width']*i + j,:,:,:] = self.X['output'][:,:,i*self.stride:i*self.stride + self.pool['hight'],j*self.stride:j*self.stride + self.pool['width']]
-        self.x = self.x.reshape(self.X['batch'], self.Y['hight']*self.Y['width'], self.X['channel'], self.pool['hight']*self.pool['width'])
+        self.X['output'] = self.x.reshape(self.X['batch'], self.Y['hight']*self.Y['width'], self.X['channel'], self.pool['hight']*self.pool['width'])
         if self.option == 0: # max pooloing
-            self.x = np.max(self.x, axis=3).transpose(0,2,1)
+            self.x = np.max(self.X['output'], axis=3).transpose(0,2,1)
         elif self.option ==1: # average pooling
-            self.x = np.average(self.x, axis=3).transpose(0,2,1)
+            self.x = np.average(self.X['output'], axis=3).transpose(0,2,1)
         return self.x.reshape(self.X['batch'], self.X['channel'], self.Y['hight'], self.Y['width'])
 
     def backward(self, dY):
@@ -147,12 +172,17 @@ class Maxout(Layer):
     X: (batch number, nodes)
     Reference: http://proceedings.mlr.press/v28/goodfellow13.pdf
     """
-    def __init__(self, weight, bias):
+    def __init__(self, weight=None, bias=None):
         super().__init__(weight, bias)
         self.W['patch'], self.W['hight'], self.W['width'] = weight.shape
         self.B['patch'], self.B['width'] = bias.shape
         self.Z = {'output':None, 'delta':None, 'batch':None, 'hight':None, 'width':None}
         self.A = {'output':None, 'delta':None}
+
+    def __call__(self, weight, bias):
+        super().__call__(weight, bias)
+        self.W['patch'], self.W['hight'], self.W['width'] = weight.shape
+        self.B['patch'], self.B['width'] = bias.shape
 
     def forward(self, X):
         super().forward(X)
@@ -167,7 +197,6 @@ class Maxout(Layer):
         self.Z['delta'] = self.Z['delta'].reshape(-1, self.Z['width'])
         index = np.argmax(self.Z['output'], axis=2).reshape(1,-1)[0]
         dY = dY.reshape(1,-1)[0]
-
         for i in range(len(index)):
             self.Z['delta'][i, index[i]] = dY[i]
         self.Z['delta'] = self.Z['delta'].reshape(self.Z['batch'], self.Z['hight'], self.Z['width'])
@@ -176,16 +205,24 @@ class Maxout(Layer):
         self.X['delta'] = np.tensordot(self.Z['delta'], self.W['weight'].T, axes=2)
         self.X['delta'] = self.X['delta'].reshape(self.X['shape'])
         return self.X['delta']
-    
+
 class BatchNormalization(Layer):
     """Batch Normalizatoin Layer
     References: http://proceedings.mlr.press/v37/ioffe15.pdf
     """
-    def __init__(self, gamma, beta):
+    def __init__(self, gamma=None, beta=None, mean_predict=0, varience_predict=0.1):
         self.N = {'gamma':gamma, 'beta':beta, 'delta-gamma':None, 'delta-beta':None, 'mean':None, 'varience':None, 'delta-mean':None, 'delta-varience':None, 'delta-hat':None}
         self.X = {'input':None, 'output':None, 'shape':None, 'delta':None, 'batch':None, 'channel':None, 'hight':None, 'width':None}
         self.eps = 10e-7
-        
+        self.p_mean = mean_predict
+        self.p_varience = varience_predict
+
+    def __call__(self, gamma, beta, mean_predict=0, varience_predict=0.1):
+        self.N['gamma'] = gamma
+        self.N['beta'] = beta
+        self.p_mean = mean_predict
+        self.p_varience = varience_predict
+
     def forward(self, X):
         super().forward(X)
         self.N['mean'] = self.X['input'].mean(axis=0)
@@ -198,7 +235,7 @@ class BatchNormalization(Layer):
         self.p_varience = varience
         self.X['output'] = (X - self.p_mean)/np.sqrt(self.p_varience + self.eps)
         return self.N['gamma']*self.X['output'] + self.N['beta']
-    
+
     def backward(self, dY):
         self.N['delta-beta'] = np.sum(dY, axis=0)
         self.N['delta-gamma'] = np.sum(dY*self.X['output'], axis=0)
@@ -207,14 +244,17 @@ class BatchNormalization(Layer):
         self.N['delta-mean'] = np.sum((-1)*self.N['delta-hat']/np.sqrt(self.N['variance'] + self.eps),axis=0) - 2*self.N['delta-varience']*np.mean((self.X['input']-self.N['mean']), axis=0)
         self.X['delta'] = (-1)*self.N['delta-hat']/np.sqrt(self.N['variance'] + self.eps) + 2*self.N['delta-varience']*(self.X['input']-self.N['mean'])/self.X['batch'] + self.N['delta-mean']/self.X['batch']
         return self.X['delta']
-    
+
 class Dropout(Layer):
     """Dropout Layer
     全結合層
     """
-    def __init__(self, dropout_rate):
+    def __init__(self, dropout_rate=0.5):
         self.rate = dropout_rate
         self.mask = None    
+
+    def __call__(self, dropout_rate=0.5):
+        self.rate = dropout_rate
 
     def forward(self, X):
         self.mask = np.random.rand(*X.shape) < self.rate
