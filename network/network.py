@@ -30,22 +30,10 @@ class Sequential:
         self.list.append(type(Dropuot()))
 
         self.layers = OrderedDict()
-        self.params = 
-        
-    def generate(self, initializer, weight, bias=None):
-        pass
+        self.params = OrderedDict()
 
     def add(self, layer):
         """
-        layer: layer instance below
-        ========================================================================================
-        Convolutional:      Convolutional(fil, bias, stride, pad, pad_val)
-        Pooling:            Pooling(ph, pw, stride, pad, pad_val)
-        Affine:             Affine(weight, bias)
-        Maxout:             Maxout(weight, biad)
-        BatchNormalization: BatchNormalization(gamma, beta, mean_predict, varience_predict)
-        Dropout:            Dropout(dropout_rate)
-        + Activation functions
         """
         if not isinstance(layer, tuple(self.list)):
             raise TypeError('The layer'+str(len(self.layers)+1) +' must be an instance of class Layer. Found: ' + str(layer))
