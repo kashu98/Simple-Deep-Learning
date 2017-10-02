@@ -13,28 +13,52 @@ class Sequential:
     """
     """
     def __init__(self):
-        self.list = []
-        self.list.append(type(ReLU()))
-        self.list.append(type(LReLU()))
-        self.list.append(type(PReLU()))
-        self.list.append(type(ELU()))
-        self.list.append(type(SELU()))
-        self.list.append(type(Sigmoid()))
-        self.list.append(type(SoftPlus()))
-        self.list.append(type(SoftSign()))
-        self.list.append(type(Convolutional()))
-        self.list.append(type(Pooling()))
-        self.list.append(type(Affine()))
-        self.list.append(type(Maxout()))
-        self.list.append(type(BatchNormalization()))
-        self.list.append(type(Dropuot()))
+        self.list_layer = []
+        # List all the layers to validate the input
+        self.list_layer.append(type(Convolutional()))
+        self.list_layer.append(type(Pooling()))
+        self.list_layer.append(type(Pading()))
+        self.list_layer.append(type(Affine()))
+        self.list_layer.append(type(Maxout()))
+        self.list_layer.append(type(BatchNormalization()))
+        self.list_layer.append(type(Dropuot()))
 
         self.layers = OrderedDict()
-        self.params = OrderedDict()
+        
+    def setup(self, initializer):
+        pass
 
     def add(self, layer):
         """
+        layer: layer instance below
+        ___________________________________________________________________________________
+        Convolutional:      Convolutional(fil, bias, stride, pad, pad_val)
+        Pooling:            Pooling(ph, pw, stride, pad, pad_val)
+        Affine:             Affine(weight, bias)
+        Maxout:             Maxout(weight, biad)
+        BatchNormalization: BatchNormalization(gamma, beta, mean_predict, varience_predict)
+        Dropout:            Dropout(dropout_rate)
+        ___________________________________________________________________________________
         """
-        if not isinstance(layer, tuple(self.list)):
+        if not isinstance(layer, tuple(self.list_layer)):
             raise TypeError('The layer'+str(len(self.layers)+1) +' must be an instance of class Layer. Found: ' + str(layer))
-        self.layers.update({'layer'+str(len(self.layers)+1):layer})
+        else:
+            self.layers.update({'layer'+str(len(self.layers)+1):layer})
+
+    def compile(self, optimizer, loss):
+        pass
+
+    def predict(self):
+        pass
+
+    def evaluate(self):
+        pass
+    
+    def gradient(self):
+        pass
+
+    def load_weight(self, file_name="weight.pkl"):
+        pass
+    
+    def save_weight(self, file_name="weight.pkl"): #保存ファイルの拡張子はあとで考える
+        pass
