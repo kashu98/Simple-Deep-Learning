@@ -34,17 +34,16 @@ backward:
 #### SoftSign
 ## Layers  
 The following layers are defined in layers.py as class that has forward and backward methods (someof them have predict method)
-#### Convolution Layer
-Input:  
-X(batch number, channel, hight, width)  
-Karnel(patch number, channel, hight, width)  
-step size (default is 1)  
-padding width (default is 0)  
-padding value (default is 0)  
+#### Convolution Layer (3D)
+This layer is compatible with minibatch and deals with a 3D tensor consists of (channel, hight, width). The input data will have a shape of (batch number, channel, hight, width).  
 #### Pooling Layer
+Two options, max pooling and average pooling, are avalable for this layer.
 #### Affine Layer
+This layer is compatible with tensor expression so that you can directly connect 3D layer and fully-conected (2D) layer.
 #### Maxout Layer
+This layer can only be used in fully-conected (2D) layer. 
 #### Batch Normalization Layer
+
 #### Dropout Layer
 ## Loss Function
 #### MAE (Mean Absolute Error)
