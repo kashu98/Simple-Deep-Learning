@@ -1,28 +1,35 @@
 import numpy as np
 
-"""
-Xは（バッチ数、幅）からなる二次元ベクトル
-Tは（バッチ数、幅）からなる二次元ベクトル
-"""
-
 def MAE(X, T):
     """Mean Absolute Error
+    
+    ## Output
+        Loss of the whole mini-batch (one value will be returned)
     """
-    return np.sum(np.absolute(X-T), axis=1)/X.shape[1]
+    return np.sum(np.absolute(X-T))/X.shape[0]
 
 def MSE(X, T):
     """Mean Square Error
+
+    ## Output
+        Loss of the whole mini-batch (one value will be returned)
     """
-    return np.sum((X-T)**2, axis=1)/X.shape[1]
+    return np.sum((X-T)**2)/X.shape[0]
 
 def RMSE(X, T):
     """Root Mean Square Error
+
+    ## Output
+        Loss of the whole mini-batch (one value will be returned)
     """
-    return np.sqrt(np.sum((X-T)**2, axis=1)/X.shape[1])
+    return np.sqrt(np.sum((X-T)**2)/X.shape[0])
 
 def CEL(X, T):
-    """Cross Entropy Loss function
+    """Cross Entropy Loss
     X: output of softmax function
-    T: one hot vector 
+    T: training data in the form of one-hot vector 
+    
+    ## Output
+        Loss of the whole mini-batch (one value will be returned)
     """
-    return np.sum(T*np.log(np.absolute(X+10e-7)),axis=1)/X.shape[1]
+    return -np.sum(T*np.log(np.absolute(X+10e-7)))/X.shape[0]
