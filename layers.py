@@ -1,9 +1,10 @@
 import numpy as np
+import h5py as h5
 from collections import OrderedDict
 from initializer import *
 from activation import *
 # ネットワークのサイズを指定されれば自動でweightとbiasを生成するモデルに変える
-
+# model weights are easily stored using  HDF5 format and that the network structure can be saved in either JSON or YAML format.
 class Layer2D:
     '''Model for fully conected layers
     '''
@@ -24,7 +25,7 @@ class Layer2D:
         self.list_S.append(type(Tanh()))
         self.list_S.append(type(ArcTan()))
         self.list_S.append(type(SoftSign()))
-        # No initializer is needed==============================
+        # No initializer is needed===============================
         
         if not isinstance(activation, (tuple(self.list_LU), tuple(self.list_S))):
             raise TypeError('The activation function '+ str(activation) + ' is not defined in the activation.py.')
@@ -54,9 +55,6 @@ class Layer2D:
             init = WeightInitializer(self.B['shape'])
             self.B['bias'] = init.ones()
 
-    def get_output_shape(self):
-        pass
-
 class Layer3D:
     '''Model for 3D layer
     '''
@@ -77,6 +75,7 @@ class Layer3D:
         self.list_S.append(type(Tanh()))
         self.list_S.append(type(ArcTan()))
         self.list_S.append(type(SoftSign()))
+        
         if not isinstance(activation, (tuple(self.list_LU), tuple(self.list_S))):
             raise TypeError('The activation function '+ str(activation) + ' is not defined in the activation.py.')
         else:
@@ -98,13 +97,7 @@ class Layer3D:
             self.W['weight'] = init.normal()
         if self.B['bias'] is None:
             self.B['bias'] = np.ones(self.B['shape'])
-
-    def backward(self, dY):
-        pass
     
-    def get_output_shape(self):
-        pass
-
 class Affine(Layer2D):
     '''Affaine Layer (compatible with tensor)
     ## Arguments
@@ -138,6 +131,17 @@ class Affine(Layer2D):
         self.W['delta'] = np.dot(self.X['output'].T, dY)
         self.B['delta'] = np.sum(dY, axis=0)
         return np.dot(dY, self.W['weight'].T).reshape(self.X_shape)
+
+    def has_params(self):
+        return True
+
+    def get_params(self):
+        params = {'weight':self.W['weight'], 'bias':self.B['bias']}
+        return params
+    
+    def get_grads(self):
+        grads = {'weight':self.W['delta'], 'bias':self.B['delta']}
+        return grads
 
 class Convolution(Layer3D):
     '''Convolution Layer
@@ -207,7 +211,18 @@ class Convolution(Layer3D):
         self.X['delta'] = self.X['delta'][:,:,self.pad['hight']//2:self.X['hight']+self.pad['hight']//2,self.pad['width']//2:self.X['width']+self.pad['width']//2]
         return self.X['delta']
 
-class Padding(Layer3D):
+    def has_params(self):
+        return True
+
+    def get_params(self):
+        params = {'weight':self.W['weight'], 'bias':self.B['bias']}
+        return params
+    
+    def get_grads(self):
+        grads = {'weight':self.W['delta'], 'bias':self.B['delta']}
+        return grads
+
+class Padding:
     '''Padding Layer
     ## Arguments
     pad_size: Tuple of two integers, (padding hight, padding width)
@@ -235,6 +250,15 @@ class Padding(Layer3D):
         dX = np.zeros(self.X_shape)
         dX = dY[:,:,self.pad['hight']:self.X_shape[2]-self.pad['hight'],self.pad['width']:self.X_shape[3]-self.pad['width']]
         return dX
+
+    def has_params(self):
+        return False
+
+    def get_params(self):
+        pass
+    
+    def get_grads(self):
+        pass
 
 class Pooling:
     '''Pooling Layer
@@ -316,6 +340,15 @@ class Pooling:
         self.X['delta'] = self.X['delta'][:,:,self.pad['hight']//2:self.X['hight']+self.pad['hight']//2,self.pad['width']//2:self.X['width']+self.pad['width']//2]
         return self.X['delta']
 
+    def has_params(self):
+        return False
+
+    def get_params(self):
+        pass
+    
+    def get_grads(self):
+        pass
+
 class Dropout:
     """Dropout Layer
     ## Arguments 
@@ -337,3 +370,12 @@ class Dropout:
 
     def backward(self, dY):
         return dY * self.mask
+
+    def has_params(self):
+        return False
+
+    def get_params(self):
+        pass
+    
+    def get_grads(self):
+        pass
