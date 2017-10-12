@@ -1,8 +1,4 @@
-import activation as af
 import numpy as np
-"""
-Reference: http://www.deeplearningbook.org/contents/optimization.html
-"""
 
 class SGD:
     """Stochastic gradient descent (SGD)
@@ -20,7 +16,9 @@ class SGD:
         self.learning_rate = learning_rate
     
     def optimize(self, parameter, gradient):
-        parameter -= self.learning_rate * gradient
+        for i in parameter:
+            parameter[i]['weight'] -= self.learning_rate * gradient[i]['weight']
+            parameter[i]['bias'] -= self.learning_rate * gradient[i]['bias']
 
 class Momentum:
     """The method of momentum (Polyak, 1964)
@@ -38,38 +36,18 @@ class Momentum:
     def __init__(self,learning_rate=0.01, momentum=0.9):
         self.learning_rate = learning_rate
         self.momentum = momentum
-        self.velocity = None
-
-    def __call__(self, velocity, learning_rate=0.01, momentum=0.9):
-        self.learning_rate = learning_rate
-        self.momentum = momentum
-        self.velocity = velocity
+        self.velocity = {}
 
     def optimize(self, parameter, gradient):
-        if self.velocity is None:
-            self.velocity = np.zeros_like(parameter)
-        self.velocity = self.momentum * self.velocity - self.learning_rate * gradient
-        parameter -= self.velocity
-
-class Nesterov_Momentum(Momentum):
-    """(Sutskever, 2013)
-    Sutskever introduced a variant of the momentum algorithm that was inspired by Nesterov’s accelerated gradient method.
-    Require: Learning rate ε, momentum parameter α.
-    Require: Initial parameter θ, initial velocity v.
-    Algorithm: 
-        while stopping criterion not met do \n
-        \t    Sample a minibatch of m examples from the training set {x_1,...,x_m} with coresponding targets y_i \n
-        \t    Apply interim update: θ* ← θ + αv \n
-        \t    Compute gradient: g ← (1/m)*∇_θSum(L(f(x;θ*),y)) \n
-        \t    Compute velocity update:  v ← αv - εg \n
-        \t    Apply update: θ ← θ - v \n
-        end while
-    """
-    def __init__(self,):
-        pass
-    def __call__(self,):
-        pass
-
+        for i in parameter:
+            if not i in self.velocity.keys():
+                self.velocity[i]['weight'] = np.zeros_like(parameter[i]['weight'])
+                self.velocity[i]['bias'] = np.zeros_like(parameter[i]['bias'])
+            self.velocity[i]['weight'] = self.momentum * self.velocity[i]['weight'] - self.learning_rate * gradient[i]['weight']
+            self.velocity[i]['bias'] = self.momentum * self.velocity[i]['bias'] - self.learning_rate * gradient[i]['bias']
+            parameter[i]['weight'] -= self.velocity[i]['weight']
+            parameter[i]['bias'] -= self.velocity[i]['bias']
+            
 class AdaGrad:
     """AdaGrad algorithm (Duchi et al., 2011)
     Require: Global learning rate ε
@@ -85,54 +63,17 @@ class AdaGrad:
         \t    Apply update: θ ← θ + ∆θ \n
         end while
     """
-    def __init__(self,):
-        pass
-    def __call__(self,):
-        pass
-
-class RMSProp:
-    """The RMSProp algorithm (Hinton, 2012)
-    This algorithm modiﬁes AdaGrad to perform better in the non-convex setting by changing the gradient accumulation into an exponentially weighted moving average.
-    Require: Global learning rate ε, decay rate ρ.
-    Require: Initial parameter θ.
-    Require: Small constant δ, usually 10^-6, used to stabilize divition by small numbers
-    Algorithm: 
-        Initialize accumulation variables γ = 0 \n
-        while stopping criterion not met do \n
-        \t    Sample a minibatch of m examples from the training set {x_1,...,x_m} with coresponding targets y_i \n
-        \t    Compute gradient: g ← (1/m)*∇_θSum(L(f(x;θ),y)) \n
-        \t    Accumulate squared gradient: γ ← ργ + (1-ρ)g☉g \n
-        \t    Compute parameter update:  ∆θ ← -(ε/sqrt(δ+γ))☉g \n
-        \t    Apply update: θ ← θ + ∆θ \n
-        end while
-    """
-    def __init__(self,):
-        pass
-    def __call__(self,):
-        pass
-
-class Adam:
-    """Adam (Kingma and Ba, 2014)
-    The name “Adam” derives from the phrase “adaptive moments.”
-    Require: Step size ε (Sugested default: 0.001).
-    Require: Exponential decay rates for moment estimates, ρ_1 and ρ_2 in [0,1) (Sugested defaults: 0.9 and 0.999 respectively).
-    Require: Initial parameter θ.
-    Require: Small constant δ used for numerical stabilization (Sugested default: 10^-8).
-    Algorithm: 
-        Initialize 1st and 2nd moment variables s = 0, r = 0 \n
-        Initialize time step t = 0 \n
-        while stopping criterion not met do \n
-        \t    Sample a minibatch of m examples from the training set {x_1,...,x_m} with coresponding targets y_i \n
-        \t    Compute gradient: g ← (1/m)*∇_θSum(L(f(x;θ),y)) t ← t + 1 \n
-        \t    Update biased ﬁrst moment estimate: s ← ρ_1*s + (1-ρ_1)g \n
-        \t    Update biased second moment estimate: r ← ρ_2*r + (1-ρ_2)g☉g \n
-        \t    Correct bias in ﬁrst moment: s ← s/(1-ρ_1^t) \n
-        \t    Correct bias in second moment: t ← t/(1-ρ_2^t) \n
-        \t    Compute parameter update:  ∆θ = -(ε*s/sqrt(r)+δ)☉g \n
-        \t    Apply update: θ ← θ + ∆θ \n
-        end while
-    """
-    def __init__(self,):
-        pass
-    def __call__(self,):
-        pass
+    def __init__(self, learning_rate=0.01):
+        self.learning_rate = learning_rate
+        self.δ = 10e-7
+        self.r = {}
+    
+    def optimize(self, parameter, gradient):
+        for i in parameter:
+            if not i in self.r.keys():
+                self.r[i]['weight'] = np.zeros_like(gradient[i]['weight'])
+                self.r[i]['bias'] = np.zeros_like(gradient[i]['bias'])
+            self.r[i]['weight'] += np.square(gradient[i]['weight'])
+            self.r[i]['bias'] += np.square(gradient[i]['bias'])
+            parameter[i]['weight'] -= np.multiply(self.learning_rate/(self.δ + np.sqrt(self.r[i]['weight'])), gradient[i]['weight'])
+            parameter[i]['bias'] -= np.multiply(self.learning_rate/(self.δ + np.sqrt(self.r[i]['bias'])), gradient[i]['bias'])
